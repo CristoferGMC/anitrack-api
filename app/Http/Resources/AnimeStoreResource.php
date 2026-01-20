@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AnimeResource extends JsonResource
+class AnimeStoreResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +16,9 @@ class AnimeResource extends JsonResource
     {
         return [
             'id'     => $this['id'],
-            'nombre' => $this['title']['romaji'] ?? null,
+            'nombre' => $this['title'] ?? null,
             'tipo'   => $this['type'] ?? null,
-            'formato'   => $this['format'] ?? null,
-            'imagen' => $this['coverImage']['large'] ?? null,
+            'estado'   => $this['status'] ?? null,
         ];
     }
 }

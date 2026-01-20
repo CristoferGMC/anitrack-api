@@ -9,7 +9,7 @@ class AniListService
 {
     public function getTopAnimes()
     {
-        //llama a la api externa
+        //llama a la api externa para mostrar los 100 animes mas populares
         $response = Http::post('https://graphql.anilist.co', [
             'query' => '
                 query {
@@ -19,6 +19,8 @@ class AniListService
                             title {
                                 romaji
                             }
+                            type
+                            format
                             coverImage {
                                 large
                             }
@@ -33,22 +35,63 @@ class AniListService
             return ['error' => 'No se pudo obtener datos de la API externa'];
         }
     }
-    public function getAnimesByStatus()
+    public function getAnimeById($id)
     {
-        $status = request('status');
-        $ids = Anime::where('status', $status)
-            ->pluck('api_id')
-            ->toArray();
-        $responses = Http::post('https://graphql.anilist.co', [
-            'query' => '
+        try {
+            $response = Http::post('https://graphql.anilist.co', [
+                'query' => '
+                    query ($id: Int) {
+                        Media(id: $id, type: ANIME) {
+                            id
+                            title {
+                                english
+                                romaji
+                            }
+                            type
+                            description
+                            format
+                            status
+                            season
+                            episodes
+                            genres
+                            studios {
+                                nodes {
+                                    name
+                                }
+                            }
+                            coverImage {
+                                large
+                            }
+                        }
+                    }
+                ',
+                'variables' => [
+                    'id' => $id
+                ],
+            ]);
+            return $response->json();
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener el anime de la API externa',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function getAnimeArrayIds(array $ids)
+    {
+        try {
+            $responses = Http::post('https://graphql.anilist.co', [
+                'query' => '
                 query ($ids: [Int]) {
-                    Page(perPage: 50) {
+                    Page(perPage: 25) {
                         media(id_in: $ids, type: ANIME) {
                             id
                             title {
                                 romaji
                                 english
                             }
+                            type
+                            format
                             coverImage {
                                     large
                             }
@@ -56,45 +99,76 @@ class AniListService
                     }
                 }
             ',
-            'variables' => [
-                'ids' => $ids
-            ],
-        ]);
-        if ($responses->successful()) {
+                'variables' => [
+                    'ids' => $ids,
+                ],
+            ]);
             $data = $responses->json();
             $datos = $data['data']['Page']['media'] ?? [];
-        } else {
-            $datos = [
-                'error' => 'No se pudo obtener datos de la API externa'
-            ];
+            return $datos;
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener los animes de la API externa',
+                //'error' => $e->getMessage() // quitar en produccion
+            ], 500);
         }
-        return $datos;
     }
-    public function getAnimeById($id)
+    public function getAnimesByStatus()
     {
-        $response = Http::post('https://graphql.anilist.co', [
-            'query' => '
-                query ($id: Int) {
-                    Media(id: $id, type: ANIME) {
-                        id
-                        title {
-                            english
-                            romaji
-                        }
-                        coverImage {
-                            large
+        $status = request('status');
+        $user = auth()->user();
+        $ids = $user->animes()
+            ->where('status', $status)
+            ->pluck('api_id')
+            ->toArray();
+        if (empty($ids)) {
+            return [];
+        }
+        $animes = $this->getAnimeArrayIds($ids);
+        return $animes;
+    }
+    public function getAnimeByTitle($id)
+    {
+        try {
+            $response = Http::post('https://graphql.anilist.co', [
+                'query' => '
+                    query ($id: Int) {
+                        Media(id: $id, type: ANIME) {
+                            title {
+                                english
+                                romaji
+                            }
+                            type
                         }
                     }
-                }
-            ',
-            'variables' => [
-                'id' => $id
-            ],
-        ]);
-        if ($response->successful()) {
+                ',
+                'variables' => [
+                    'id' => $id
+                ],
+            ]);
             return $response->json();
-        } else {
-            return ['error' => 'No se pudo obtener datos de la API externa'];
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener el anime de la API externa',
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
+    public function storeAnime(array $data)
+    {
+        $response = $this->getAnimeById($data['api_id']);
+        $data['title'] = $response['data']['Media']['title']['romaji'] ?? null;
+        $data['type'] = $response['data']['Media']['type'] ?? null;
+        return $data;
+    }
+    public function showAnime($id)
+    {
+        $response = $this->getAnimeById($id);
+        $anime = auth()->user()->animes()->where('api_id', $id)->first();
+        if ($anime) {
+            $response['data']['Media']['id_registro'] = $anime->id;
+            $response['data']['Media']['status_anime'] = $anime->status;
+        }
+        return $response['data']['Media'] ?? null;
     }
 }

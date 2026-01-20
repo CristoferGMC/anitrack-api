@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\AnimeStatus;
+use App\Enums\MangaStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAnimeRequest extends FormRequest
+class StoreMangaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,10 @@ class StoreAnimeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'episodes' => 'nullable|integer',
-            'status' => ['required', Rule::enum(AnimeStatus::class)],
-            'api_id' => 'required|integer'
+            'volumes' => 'nullable|integer',
+            'chapters' => 'nullable|integer',
+            'status' => ['required', Rule::enum(MangaStatus::class)],
+            'api_id' => 'required|integer|unique:mangas,api_id',
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AnimeStatus;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Manga extends Api
 {
@@ -13,7 +14,6 @@ class Manga extends Api
         'chapters',
         'status',
         'api_id',
-        'user_id',
     ];
     protected $casts = [
         'volumes' => 'integer',
@@ -21,4 +21,8 @@ class Manga extends Api
         'api_id' => 'integer',
         'status' => AnimeStatus::class,
     ];
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

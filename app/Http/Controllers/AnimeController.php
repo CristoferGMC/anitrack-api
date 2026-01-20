@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAnimeRequest;
 use App\Http\Requests\UpdateAnimeRequest;
 use App\Http\Resources\AnimeResource;
+use App\Http\Resources\AnimeShowResource;
+use App\Http\Resources\AnimeStoreResource;
 use App\Models\Anime;
 use App\Services\AniListService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AnimeController extends Controller
+class AnimeController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:api', except: ['index', 'top', 'show']),
+        ];
+    }
     public function __construct(
         private AniListService $aniListService
     ) {}
@@ -28,22 +38,15 @@ class AnimeController extends Controller
         $animes = $this->aniListService->getAnimesByStatus();
         return AnimeResource::collection($animes);
     }
-    /**
+    /*
      * Store a newly created resource in storage.
      */
     public function store(StoreAnimeRequest $request)
     {
-        try {
-            Anime::create($request->validated());
-            return response()->json([
-                'message' => 'Registro exitoso'
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Error al registrar',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        $data = $request->validated();
+        $response = $this->aniListService->storeAnime($data);
+        $anime = $request->user()->animes()->create($response);
+        return AnimeStoreResource::make($anime, 201);
     }
 
     /**
@@ -51,8 +54,8 @@ class AnimeController extends Controller
      */
     public function show($id)
     {
-        $anime = $this->aniListService->getAnimeById($id);
-        return AnimeResource::make($anime['data']['Media'] ?? null);
+        $anime = $this->aniListService->showAnime($id);
+        return AnimeShowResource::make($anime);
     }
 
     /**
@@ -62,7 +65,9 @@ class AnimeController extends Controller
     {
         $data = $request->validated();
         $anime->update($data);
-        return AnimeResource::make($anime);
+        return response()->json([
+            'message' => 'Actualización exitosa'
+        ], 200);
     }
 
     /**

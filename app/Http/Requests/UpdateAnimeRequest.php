@@ -24,16 +24,8 @@ class UpdateAnimeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'type' => 'required|string|max:50',
             'episodes' => 'nullable|integer',
             'status' => ['required', Rule::enum(AnimeStatus::class)],
-            'api_id' => [
-                'required',
-                'integer',
-                Rule::unique('animes', 'api_id')->ignore($this->route('anime')),
-            ],
-            'user_id' => 'required|integer|exists:users,id',
         ];
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('type');
             $table->integer('episodes')->nullable();
             $table->string('status');
-            $table->integer('api_id')->unique();
+            $table->integer('api_id');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

@@ -15,7 +15,7 @@ class AnimeSeeder extends Seeder
     {
         $animes = [
             [
-                'title' => 'Naruto',
+                'title' => 'Shingeki no Kyojin',
                 'type' => 'anime',
                 'status' => 'siguiendo',
                 'episodes' => null,
@@ -23,7 +23,7 @@ class AnimeSeeder extends Seeder
                 'user_id' => 1,
             ],
             [
-                'title' => 'Attack on Titan',
+                'title' => 'Kimetsu no Yaiba',
                 'type' => 'anime',
                 'status' => 'siguiendo',
                 'episodes' => 2,
@@ -31,7 +31,7 @@ class AnimeSeeder extends Seeder
                 'user_id' => 1,
             ],
             [
-                'title' => 'Fullmetal Alchemist: Brotherhood',
+                'title' => 'Death Note',
                 'type' => 'anime',
                 'status' => 'siguiendo',
                 'episodes' => 1,
@@ -39,7 +39,7 @@ class AnimeSeeder extends Seeder
                 'user_id' => 1,
             ],
             [
-                'title' => 'Death Note',
+                'title' => 'HUNTER×HUNTER (2011)',
                 'type' => 'anime',
                 'status' => 'siguiendo',
                 'episodes' => 2,
@@ -47,7 +47,7 @@ class AnimeSeeder extends Seeder
                 'user_id' => 1,
             ],
             [
-                'title' => 'Your Name',
+                'title' => 'One Punch Man',
                 'type' => 'anime',
                 'status' => 'favorito',
                 'episodes' => 3,
