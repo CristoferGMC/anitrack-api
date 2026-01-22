@@ -1,43 +1,74 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Anitrack API
 
-## About Laravel
+API RESTful desarrollada en Laravel para la gestión y consulta de animes y mangas, integrando autenticación JWT y consumo de datos desde AniList.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requisitos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **PHP** >= 8.2
+- **MySQL**
+- **Composer**
+- **Node.js y npm** (opcional para assets)
+- **Extensiones:** Laravel Sanctum, JWT Auth
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Instalación
 
-## Learning Laravel
+1. Clona el repositorio y entra a la carpeta del proyecto.
+2. Instala dependencias backend:
+	```
+	composer install
+	```
+3. Copia el archivo `.env.example` a `.env` y configura tu base de datos y llaves JWT.
+4. Ejecuta las migraciones y seeders:
+	```
+	php artisan migrate --seed
+	```
+5. Genera la clave JWT:
+	```
+	php artisan jwt:secret
+	```
+6. Inicia el servidor:
+	```
+	php artisan serve
+	```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Endpoints principales
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Autenticación:**
+  - `POST /api/auth/register` — Registro de usuario
+  - `POST /api/auth/login` — Login y obtención de token JWT
+  - `POST /api/auth/logout` — Cierre de sesión
+  - `POST /api/auth/refresh` — Refrescar token
+  - `POST /api/auth/me` — Información del usuario autenticado
 
-## Laravel Sponsors
+- **Animes:**
+  - `GET /api/animes` — Listado de animes
+  - `GET /api/animes/top` — Top 100 animes populares (AniList)
+  - `GET /api/animes/{id}` — Detalle de anime
+  - `POST /api/animes` — Crear anime (requiere autenticación)
+  - `PUT /api/animes/{id}` — Actualizar anime (requiere autenticación)
+  - `DELETE /api/animes/{id}` — Eliminar anime (requiere autenticación)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Mangas:**
+  - `GET /api/mangas` — Listado de mangas
+  - `GET /api/mangas/top` — Top 100 mangas populares (AniList)
+  - `GET /api/mangas/{id}` — Detalle de manga
+  - `POST /api/mangas` — Crear manga (requiere autenticación)
+  - `PUT /api/mangas/{id}` — Actualizar manga (requiere autenticación)
+  - `DELETE /api/mangas/{id}` — Eliminar manga (requiere autenticación)
 
-### Premium Partners
+## Seguridad
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- Autenticación basada en JWT.
+- Rutas protegidas para operaciones de escritura.
+
+## Integraciones
+
+- Consumo de la API pública de AniList para obtener información actualizada de animes y mangas.
+
+## Testing
+
+- Incluye pruebas con PestPHP.
 - **[DevSquad](https://devsquad.com/hire-laravel-developers)**
 - **[Redberry](https://redberry.international/laravel-development)**
 - **[Active Logic](https://activelogic.com)**
